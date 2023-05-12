@@ -57,8 +57,11 @@ def ReadFromSensor(ScannerHandle, Command, DllHandle):
     iRet = DllHandle.EthernetScanner_ReadData(ScannerHandle, SendBuffer, ReturnValue, c_int(50), 0)    
     if  iRet == 0:        
         return str(ReturnValue.value.decode())
-    else:    
-        return "Error"    
+    else:  
+        print(iRet)  
+        return "Error"
+      
+  
 
 #===============================================================================
 # Function to write settings to weCat3D sensor
@@ -66,7 +69,7 @@ def ReadFromSensor(ScannerHandle, Command, DllHandle):
 def WriteToSensor(ScannerHandle, DllHandle, Command):   
     CommandToSend = Command.encode()
     cmdlen = len(CommandToSend)
-    iRet = DllHandle.EthernetScanner_WriteData(Scanner, CommandToSend, cmdlen)
+    iRet = DllHandle.EthernetScanner_WriteData(ScannerHandle, CommandToSend, cmdlen)
     if iRet != cmdlen: 
         print("Could not send command "+CommandToSend)
         return 0
@@ -82,11 +85,11 @@ ip = "169.254.58.130".encode()
 port = "32001".encode()
 dll_path = "C:/Users/maria/OneDrive/Documentos/sensor_MLSL276/"
 
-XArray = (c_double * 2048)(0)
-ZArray = (c_double * 2048)(0)
-Intensity = (c_int * 2048)(0)
-PeakWidth = (c_int * 2048)(0)
-BufferSize = c_int(2048)
+XArray = (c_double * 1024)(0)
+ZArray = (c_double * 1024)(0)
+Intensity = (c_int * 1024)(0)
+PeakWidth = (c_int * 1024)(0)
+BufferSize = c_int(1024)
 Encoder = c_int(0)
 UserIO = c_int(0)
 PicCnt = c_int(0)
@@ -136,7 +139,7 @@ if not WriteToSensor(Scanner, Dll, "SetAcquisitionStart\r"):
 # Read current exposure time and set new one increased by either by 100 �s
 # or set to 100 �s if longer than 1000 �s.
 #===============================================================================
-ReturnedString = ReadFromSensor(Scanner, "GetExposureTime", Dll)
+ReturnedString = ReadFromSensor(Scanner, "GetExposureTime\n", Dll)
 print("Current exposure time: %s" % ReturnedString)
 if ReturnedString != "Error":        
     CurrentExposureTime = int(ReturnedString)
@@ -168,6 +171,10 @@ while time.time() < TimeStart + 3 and AmountOfReadedScanns < 10:
     sys.stdout.write("Intensity average %d " % IntensityAverage)        
     sys.stdout.write("Encoder %d " % Encoder.value)    
     sys.stdout.write("Picture counter %d\n" % PicCnt.value)
+    for i in range(0,50,len(XArray)):
+        print("x = ",XArray[i]) 
+    for i in range(0,50,len(ZArray)):
+        print("Z = ", ZArray[i]) 
     #sys.stdout.flush()
-print("Amount of readed scanns: %d" % AmountOfReadedScanns)        
-
+    
+print("Amount of readed scanns: %d" % AmountOfReadedScanns)  

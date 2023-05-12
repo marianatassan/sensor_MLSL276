@@ -1,3 +1,5 @@
+
+
 // cria a conexão com o sensor e retorna um ponteiro NULL em caso de falha
 // *chIP: endereço IP do sensor
 // *chPort: numero da porta do sensor
@@ -15,3 +17,4 @@ void* EthernetScanner_ConnectUDP(char* chDestIP, char* chDestPort, char* chSrcIP
 
 // fecha a conexão
 void* _stdcall EthernetScanner_Disconnect(void *pEthernetScanner)
+
